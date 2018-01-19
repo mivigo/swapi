@@ -11,7 +11,6 @@ class PersonsController extends Controller
 
     public function __construct() {
         $this->middleware('auth');
-//        $this->middleware('auth', ['except' => 'create']);
     }
 
     public function  index () {
@@ -80,9 +79,6 @@ class PersonsController extends Controller
 
     public function destroy($id)
     {
-//        Persons::find($request->id)->delete();
-//        flash('successfully DELETED!', 'danger');
-//        return redirect('persons');
         Persons::find($id)->delete();
         flash('successfully DELETED!', 'danger');
         return redirect('persons');
