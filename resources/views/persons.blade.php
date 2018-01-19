@@ -7,10 +7,16 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.5/sweetalert2.min.css">
+    {{--<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.5/sweetalert2.common.min.js"></script>--}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.5/sweetalert2.min.js"></script>
 </head>
 <body>
 <div class="container">
-    <h2>Persons Table</h2>
+    <div class=class="col-sm">
+        <h2>Persons Table</h2>
+        <a href="{{url('/')}}/getdata" onclick="return confirm('Get all Persons?');" type="button" class="btn btn-primary">Download data to DB</a>
+    </div>
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -83,7 +89,7 @@
                     {{--<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>--}}
                     {{--</a>--}}
 
-                    <a href="{{ env('APP_URL') }}/persons/id/edit"
+                    <a href="{{url('/')}}/persons/{{ $value->id }}/edit"
                        data-id="1"
                        data-toggle="modal"
                        data-target="#editPerson"
@@ -91,21 +97,68 @@
                        title="Edit">
                         <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                     </a>
-                    <a id='iddeleteLeadnum' onclick='deleteButton(this.id)'
-                       data-urltodelete='leads' data-num='id' data-id='{id'
-                       class='btn btn-danger btn-xs click-action'
-                       title='Delete'>
+                    {!! Form::open(['method' => 'DELETE','route' => ['persons.destroy', $value->id],'style'=>'display:inline']) !!}
+                    {{--<a href="{{env('APP_URL')}}/persons/{{ $value->id }}" onclick="deletePerson({{ $value->id }})"--}}
+                    <button onclick="return confirm('Are you sure you want to delete this item?');"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            class='btn btn-danger btn-xs click-action'
+                            title='Delete'>
                         <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>
-                    </a>
+                    </button>
+                    {!! Form::close() !!}
                 </td>
             </tr>
         @endforeach
-
         </tbody>
     </table>
     @include ('emptyModal', ['name' => 'editPerson'])
 </div>
+@section('scripts')
+    <script>
+        function deletePerson(id) {
+        var appUrl = '{{env('APP_URL')}}';
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(function(isConfirm) {
+            if (isConfirm) {
+                return new Promise(function () {
+                    $.ajax({
+                        type: "POST",
+                        data:{
+                            _method:"DELETE"
+                        },
+                        url: appUrl + '/persons/' + id,
+                        success: function () {
+                            swal({
+                                timer: 1000,
+                                text: 'Deleted!',
+                                type: "success"
+                            });
+                            $('.' + num).css('display', 'none');
+                        },
+                        error: function (data) {
+                            swal({
+                                timer: 1000,
+                                text: "ERROR " + "Something went wrong",
+                                type: "error"
+                            });
+                        }
+                    });
+                });
+            }
+        })
+        }
+    </script>
+@stop
 
+@yield('scripts')
 </body>
 </html>
 

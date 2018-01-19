@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use GuzzleHttp;
 use App\Persons;
 use Illuminate\Support\Facades\Auth;
 class PersonsController extends Controller
@@ -27,7 +26,7 @@ class PersonsController extends Controller
 
         $this->getData($obj);
 
-        $this->index();
+        return redirect('/');
     }
 
     public function getContent($url) {
@@ -48,7 +47,6 @@ class PersonsController extends Controller
                     foreach ($value as $key => $item) {
                         if (is_array($item)) {
                             $value->$key = json_encode($value->$key, JSON_UNESCAPED_SLASHES);
-    //                        $value->$key = $links = implode(',', $value->$key);
                         }
                     }
                     $data = (array) $value;
@@ -68,32 +66,26 @@ class PersonsController extends Controller
         Auth::user()->persons()->firstOrCreate($data);
     }
 
-    public function store(Request $request)
-    {
-        $persons = new Persons();
-
-        $persons->name = $request->name;
-dd($persons);
-        $persons->save();
-    }
-
     public function edit($id)
     {
-        $persons = Article::findOrFail($id);
+        $persons = Persons::findOrFail($id);
 //
 //        $tags = Tag::pluck('name', 'id');
 //        return view ('articles.edit', compact('article', 'tags'));
 ////
 //        $persons = Persons::all();
 //        $companies = Company::orderBy('name', 'asc')->get();
-        return view('leads.modalEditLeads', compact('lead', 'users', 'companies'));
+        return view('leads.modalEditLeads', compact('persons'));
     }
 
     public function destroy($id)
     {
-        Lead::destroy($id['id']);
+//        Persons::find($request->id)->delete();
+//        flash('successfully DELETED!', 'danger');
+//        return redirect('persons');
+        Persons::find($id)->delete();
         flash('successfully DELETED!', 'danger');
-        return redirect('leads');
+        return redirect('persons');
     }
 
 }

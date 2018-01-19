@@ -12,10 +12,11 @@
 */
 
 Route::get('/', 'PersonsController@index');
+Route::get('/getdata', 'PersonsController@getAllPersons');
 //Route::get('/', 'PersonsController@getAllPersons');
 
 Route::resource('persons', 'PersonsController');
 
 Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
+//
+//Route::get('/home', 'HomeController@index')->name('home');
