@@ -32,7 +32,7 @@
             <th>Species</th>
             <th>Vehicles</th>
             <th>Starships</th>
-            <th></th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
@@ -80,15 +80,6 @@
                     @endforeach
                 </td>
                 <td>
-                    {{--<a href="{{ env('APP_URL') }}/leads/id"--}}
-                    {{--data-id="id"--}}
-                    {{--data-toggle="modal"--}}
-                    {{--data-target="#viewPerson"--}}
-                    {{--class="btn btn-success btn-xs click-action"--}}
-                    {{--title="Overview">--}}
-                    {{--<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>--}}
-                    {{--</a>--}}
-
                     <a href="{{url('/')}}/persons/{{ $value->id }}/edit"
                        data-id="1"
                        data-toggle="modal"
@@ -97,27 +88,33 @@
                        title="Edit">
                         <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                     </a>
-                    {!! Form::open(['method' => 'DELETE','route' => ['persons.destroy', $value->id],'style'=>'display:inline']) !!}
-                    {{--<a href="{{env('APP_URL')}}/persons/{{ $value->id }}" onclick="deletePerson({{ $value->id }})"--}}
-                    <button onclick="return confirm('Are you sure you want to delete this item?');"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            class='btn btn-danger btn-xs click-action'
-                            title='Delete'>
+                    <a onclick="deletePerson({{ $value->id }})"
+                       data-toggle="tooltip"
+                       data-placement="top"
+                       class='btn btn-danger btn-xs click-action'
+                       title='Delete'>
                         <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>
-                    </button>
-                    {!! Form::close() !!}
+                    </a>
                 </td>
             </tr>
         @endforeach
         </tbody>
     </table>
+    {{ $persons->links() }}
+
     @include ('emptyModal', ['name' => 'editPerson'])
 </div>
 @section('scripts')
     <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-Token': $('meta[name="_token"]').attr('content'),
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
         function deletePerson(id) {
-        var appUrl = '{{env('APP_URL')}}';
+        var appUrl = '{{url('/')}}';
         swal({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -132,6 +129,7 @@
                     $.ajax({
                         type: "POST",
                         data:{
+                            _token: '{{ csrf_token() }}',
                             _method:"DELETE"
                         },
                         url: appUrl + '/persons/' + id,
@@ -159,6 +157,9 @@
 @stop
 
 @yield('scripts')
+
+@include ('emptyModal', ['name' => 'editPerson'])
+
 </body>
 </html>
 

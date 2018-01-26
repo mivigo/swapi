@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Auth\Access\Response;
 use Illuminate\Http\Request;
 use App\Persons;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,7 @@ class PersonsController extends Controller
 
     public function  index () {
 
-        $persons = Persons::all();
+        $persons = Persons::paginate(15);
 
         return view('persons', compact('persons'));
     }
@@ -67,14 +68,22 @@ class PersonsController extends Controller
 
     public function edit($id)
     {
-        $persons = Persons::findOrFail($id);
-//
-//        $tags = Tag::pluck('name', 'id');
-//        return view ('articles.edit', compact('article', 'tags'));
-////
-//        $persons = Persons::all();
-//        $companies = Company::orderBy('name', 'asc')->get();
-        return view('leads.modalEditLeads', compact('persons'));
+        $users = Persons::all();
+        $person = Persons::find($id);
+        
+        return view('modalEditPerson', compact('person', 'users'));
+    }
+
+    public function update(Request $request, Persons $person)
+    {
+        if ($request->ajax()) {
+            $response = ['has been successfully Updated!'];
+            return Response::json($response);
+        } else {
+            $person->update($request->all());
+            flash('Lead has been successfully UPDATED!');
+            return redirect('persons');
+        }
     }
 
     public function destroy($id)
